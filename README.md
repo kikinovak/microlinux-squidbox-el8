@@ -97,6 +97,8 @@ Préparer le terrain pour Ansible :
 # ansible-pull -U https://github.com/kikinovak/microlinux-squidbox-el8 bootstrap.yml
 ```
 
+> Il faudra fournir le mot de passe pour Ansible Vault.
+
 Lancer la configuration du *routerboard* :
 
 ```
