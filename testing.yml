@@ -1,0 +1,15 @@
+---  # testing.yml
+
+- hosts: localhost
+
+  tasks:
+
+    - name: Install ansible-pull cronjob
+      ansible.builtin.cron:
+        user: root
+        name: Provisioned by Ansible
+        minute: "*/10"
+        job: "/usr/bin/ansible-pull -o -U https://github.com/kikinovak/\
+              microlinux-squidbox-el8.git > /dev/null"
+
+...
