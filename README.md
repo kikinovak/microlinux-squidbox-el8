@@ -27,7 +27,7 @@ Configuration Ansible pour mon *routerboard* PC Engines APU3
   démarrer.
 
 - Surveiller le démarrage du *routerboard* dans le réseau local avec `watch
-  nmap squidbox` et guetter l'ouverture du port (`5901/tcp open  vnc-1`) pour
+  nmap squidbox` et guetter l'ouverture du port (`5901/tcp open vnc-1`) pour
   la connexion VNC.
 
 - Lancer KRDC sur le PC externe et initier une connexion à l'adresse
@@ -94,14 +94,14 @@ Installer Ansible :
 Préparer le terrain pour Ansible :
 
 ```
-# ansible-pull -U https://gitlab.com/kikinovak/microlinux-squidbox-el8 \
+# ansible-pull -U https://github.com/kikinovak/microlinux-squidbox-el8 \
   bootstrap.yml
 ```
 
 Lancer la configuration du *routerboard* :
 
 ```
-# ansible-pull -U https://gitlab.com/kikinovak/microlinux-squidbox-el8
+# ansible-pull -U https://github.com/kikinovak/microlinux-squidbox-el8
 ```
 
 Redémarrer :
