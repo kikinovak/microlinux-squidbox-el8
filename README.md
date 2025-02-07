@@ -94,8 +94,7 @@ Installer Ansible :
 Préparer le terrain pour Ansible :
 
 ```
-# ansible-pull -U https://github.com/kikinovak/microlinux-squidbox-el8 \
-  bootstrap.yml
+# ansible-pull -U https://github.com/kikinovak/microlinux-squidbox-el8 bootstrap.yml
 ```
 
 Lancer la configuration du *routerboard* :
