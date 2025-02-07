@@ -10,7 +10,7 @@
 
 - [ ] Postfix minimal pour l'envoi de mails
 
-- [ ] Synchronisation NTP
+- [x] Synchronisation NTP
 
 - [ ] DNF automatic
 

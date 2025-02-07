@@ -15,6 +15,7 @@
     prefix_wan: "{{ansible_default_ipv4.prefix}}"
     gateway_wan: "{{ansible_default_ipv4.gateway}}"
     interface_lan: enp2s0
+    network_lan: 192.168.3.0/24
     address_lan: 192.168.3.1
     prefix_lan: 24
     dns1: 1.1.1.1
@@ -518,6 +519,28 @@
         - dns
         - ntp
 
+    # FirewallD
+
+    - name: Make sure Chrony is installed
+      ansible.builtin.dnf:
+        name: chrony
+        state: present
+
+    - name: Make sure Chrony is enabled and started
+      ansible.builtin.service:
+        name: chronyd
+        enabled: true
+        state: started
+
+    - name: Configure Chrony
+      ansible.builtin.template:
+        src: chrony.conf.j2
+        dest: /etc/chrony.conf
+        owner: root
+        group: root
+        mode: 0644
+      notify: Restart Chrony
+
     # # Execute ansible-pull every 10 minutes
 
     # - name: Install ansible-pull cronjob
@@ -565,6 +588,13 @@
     - name: Restart Dnsmasq
       ansible.builtin.service:
         name: dnsmasq
+        state: restarted
+
+    # Chrony
+
+    - name: Restart Chrony
+      ansible.builtin.service:
+        name: chronyd
         state: restarted
 
 ...
