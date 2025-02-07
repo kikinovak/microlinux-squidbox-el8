@@ -16,3 +16,5 @@
 
 - [ ] Dnsmasq
 
+- [ ] Cronjob pour `ansible-pull`
+
