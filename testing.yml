@@ -62,4 +62,15 @@
         - mdns
         - samba-client
 
+    - name: Allow DNS & NTP
+      ansible.posix.firewalld:
+        zone: internal
+        service: "{{item}}"
+        state: enabled
+        permanent: true
+        immediate: true
+      loop:
+        - dns
+        - ntp
+    
 ...
