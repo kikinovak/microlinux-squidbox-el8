@@ -6,7 +6,7 @@ dhcp-range=192.168.3.100,192.168.3.200,24h
 local=/{{domain_lan}}/
 domain={{domain_lan}}
 expand-hosts
-server=8.8.8.8
-server=8.8.4.4
+server={{dns1}}
+server={{dns2}}
 no-resolv
 log-facility=/var/log/dnsmasq.log
