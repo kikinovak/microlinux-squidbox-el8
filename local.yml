@@ -350,7 +350,9 @@
         name: dnsmasq
         state: present
 
-    # TODO: Check out if Dnsmasq starts using the default configuration
+    # We're using Dnsmasq's default configuration at first to fire it up and
+    # maintain an Internet connection but we'll switch to our own custom
+    # configuration in the next step 
 
     - name: Make sure Dnsmasq is enabled and started
       ansible.builtin.service:
