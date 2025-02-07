@@ -41,4 +41,12 @@
         permanent: true
         immediate: true
 
+    - name: Associate internal zone to LAN network interface
+      ansible.posix.firewalld:
+        zone: internal
+        interface: "{{interface_lan}}"
+        state: enabled
+        permanent: true
+        immediate: true
+
 ...
