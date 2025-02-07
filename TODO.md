@@ -6,7 +6,7 @@
 
 - [ ] Installer et configurer un client Icinga
 
-- [ ] Configurer FirewallD
+- [x] Configurer FirewallD
 
 - [ ] Postfix minimal pour l'envoi de mails
 
