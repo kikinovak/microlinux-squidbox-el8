@@ -1,0 +1,56 @@
+---  # bootstrap.yml
+
+- hosts: localhost
+
+  vars_prompt:
+
+    - name: vault_passwd
+      prompt: Enter Ansible Vault password
+      private: true
+
+  tasks:
+
+    - name: Get effective user ID
+      ansible.builtin.set_fact:
+        eff_uid: "{{lookup('pipe', 'id -u')}}"
+
+    - block:
+        - ansible.builtin.debug:
+            msg: "Please run this program as root."
+        - meta: end_play
+      when: eff_uid|int != 0
+
+    - name: Make sure we're running Rocky Linux 8.x
+      ansible.builtin.assert:
+        that:
+          - ansible_distribution == "Rocky"
+          - ansible_distribution_major_version is version('8', '=')
+        fail_msg: "Please run this playbook on Rocky Linux 8.x only."
+
+    - name: Install Python3
+      ansible.builtin.dnf:
+        name: python3
+        state: present
+
+    - name: Configure Ansible
+      ansible.builtin.copy:
+        dest: /root/.ansible.cfg
+        owner: root
+        group: root
+        mode: 0644
+        content: |
+          [defaults]
+          vault_password_file = /etc/ansible/vault_pass
+          display_skipped_hosts = false
+          deprecation_warnings = false
+          nocows = true
+
+    - name: Configure Ansible Vault
+      ansible.builtin.copy:
+        dest: /etc/ansible/vault_pass
+        owner: root
+        group: root
+        mode: 0600
+        content: "{{vault_passwd}}\n"
+
+...

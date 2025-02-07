@@ -1,0 +1,503 @@
+---  # local.yml
+
+- hosts: localhost
+
+  # Variables in order of appearance
+
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    firstuser_login: microlinux
+    firstuser_name: Microlinux
+    hostname: squidbox
+    domain_lan: sandbox.lan
+    interface_wan: enp1s0
+    address_wan: "{{ansible_default_ipv4.address}}"
+    prefix_wan: "{{ansible_default_ipv4.prefix}}"
+    gateway_wan: "{{ansible_default_ipv4.gateway}}"
+    interface_lan: enp2s0
+    address_lan: 192.168.3.1
+    prefix_lan: 24
+
+  tasks:
+
+    # Run as root only
+
+    - name: Get effective user ID
+      ansible.builtin.set_fact:
+        eff_uid: "{{lookup('pipe', 'id -u')}}"
+
+    - block:
+        - ansible.builtin.debug:
+            msg: "Please run this program as root."
+        - meta: end_play
+      when: eff_uid|int != 0
+
+    # Run on Rocky Linux 8.x only
+
+    - name: Make sure we're running Rocky Linux 8.x
+      ansible.builtin.assert:
+        that:
+          - ansible_distribution == "Rocky"
+          - ansible_distribution_major_version is version('8', '=')
+        fail_msg: "Please run this playbook on Rocky Linux 8.x only."
+
+    # Passwords and other sensitive data
+
+    - name: Include encrypted variables
+      ansible.builtin.include_vars:
+        file: vars/secret.yml
+
+    # System locale & keyboard layout
+
+    - name: Install basic language packs
+      ansible.builtin.dnf:
+        name:
+          - glibc-langpack-de
+          - glibc-langpack-en
+          - glibc-langpack-fr
+
+    - name: Configure system locale
+      ansible.builtin.command:
+        cmd: localectl set-locale en_US.UTF-8
+      changed_when: false
+
+    - name: Configure console keyboard layout
+      ansible.builtin.command:
+        cmd: localectl set-keymap --no-convert ch-fr
+      changed_when: false
+
+    # SELinux
+
+    - name: Enable SELinux in enforcing mode
+      ansible.posix.selinux:
+        policy: targeted
+        state: enforcing
+      notify: Relabel filesystem
+
+    # Setup root account
+
+    - name: Set password and generate SSH key pair for root
+      ansible.builtin.user:
+        name: root
+        password: >-
+          {{root_passwd|
+          password_hash('sha512', 65534|
+          random(seed=inventory_hostname)|
+          string)}}
+        generate_ssh_key: true
+        ssh_key_type: ed25519
+        ssh_key_file: .ssh/id_ed25519
+
+    # Persistent password for sudo
+
+    - name: Configure persistent password for sudo
+      ansible.builtin.copy:
+        dest: /etc/sudoers.d/persistent_password
+        owner: root
+        group: root
+        mode: 0644
+        content: |
+          # Timeout
+          Defaults timestamp_timeout=-1
+
+    # Custom Bash shell
+
+    - name: Configure Bash shell for root
+      ansible.builtin.copy:
+        src: bashrc-root
+        dest: /root/.bashrc
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Configure Bash shell for future users
+      ansible.builtin.copy:
+        src: bashrc-user
+        dest: /etc/skel/.bashrc
+        owner: root
+        group: root
+        mode: 0644
+
+    # Vim editor
+
+    - name: Make sure Vim is installed
+      ansible.builtin.dnf:
+        name: vim-enhanced
+        state: present
+
+    - name: Configure Vim editor for root
+      ansible.builtin.copy:
+        src: vimrc
+        dest: /root/.vimrc
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Configure Vim editor for future users
+      ansible.builtin.copy:
+        src: vimrc
+        dest: /etc/skel/.vimrc
+        owner: root
+        group: root
+        mode: 0644
+
+    # Initial non-root user
+
+    - name: "Setup account and generate SSH key pair for initial user: \
+             {{firstuser_login}}"
+      ansible.builtin.user:
+        name: "{{firstuser_login}}"
+        comment: "{{firstuser_name}}"
+        password: >-
+          {{firstuser_passwd|
+          password_hash('sha512', 65534|
+          random(seed=inventory_hostname)|
+          string)}}
+        generate_ssh_key: true
+        ssh_key_type: ed25519
+        ssh_key_file: .ssh/id_ed25519
+
+    - name: "Define administrator rights for initial user: {{firstuser_login}}"
+      ansible.builtin.user:
+        name: "{{firstuser_login}}"
+        groups: wheel,systemd-journal
+
+    # Official repositories
+
+    - name: Enable Rocky Linux BaseOS repository with a priority of 1
+      ansible.builtin.yum_repository:
+        name: baseos
+        file: Rocky-BaseOS
+        description: BaseOS
+        baseurl:
+          - http://mirror.in2p3.fr/pub/linux/rocky/$releasever/BaseOS/$basearch/os/
+          - http://dl.rockylinux.org/$contentdir/$releasever/BaseOS/$basearch/os/
+        gpgcheck: true
+        gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-rockyofficial
+        enabled: true
+        priority: 1
+
+    - name: Enable Rocky Linux AppStream repository with a priority of 1
+      ansible.builtin.yum_repository:
+        name: appstream
+        file: Rocky-AppStream
+        description: AppStream
+        baseurl:
+          - http://mirror.in2p3.fr/pub/linux/rocky/$releasever/AppStream/$basearch/os/
+          - http://dl.rockylinux.org/$contentdir/$releasever/AppStream/$basearch/os/
+        gpgcheck: true
+        gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-rockyofficial
+        enabled: true
+        priority: 1
+
+    - name: Enable Rocky Linux Extras repository with a priority of 1
+      ansible.builtin.yum_repository:
+        name: extras
+        file: Rocky-Extras
+        description: Extras
+        baseurl:
+          - http://mirror.in2p3.fr/pub/linux/rocky/$releasever/extras/$basearch/os/
+          - http://dl.rockylinux.org/$contentdir/$releasever/extras/$basearch/os/
+        gpgcheck: true
+        gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-rockyofficial
+        enabled: true
+        priority: 1
+
+    - name: Enable Rocky Linux PowerTools repository with a priority of 1
+      ansible.builtin.yum_repository:
+        name: powertools
+        file: Rocky-PowerTools
+        description: PowerTools
+        baseurl:
+          - http://mirror.in2p3.fr/pub/linux/rocky/$releasever/PowerTools/$basearch/os/
+          - http://dl.rockylinux.org/$contentdir/$releasever/PowerTools/$basearch/os/
+        gpgcheck: true
+        gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-rockyofficial
+        enabled: true
+        priority: 1
+
+    - name: Disable unneeded Rocky Linux repositories
+      ansible.builtin.file:
+        path: "{{item}}"
+        state: absent
+      loop:
+        - /etc/yum.repos.d/Rocky-Debuginfo.repo
+        - /etc/yum.repos.d/Rocky-Devel.repo
+        - /etc/yum.repos.d/Rocky-HighAvailability.repo
+        - /etc/yum.repos.d/Rocky-Media.repo
+        - /etc/yum.repos.d/Rocky-NFV.repo
+        - /etc/yum.repos.d/Rocky-Plus.repo
+        - /etc/yum.repos.d/Rocky-ResilientStorage.repo
+        - /etc/yum.repos.d/Rocky-RT.repo
+        - /etc/yum.repos.d/Rocky-Sources.repo
+
+    # EPEL repositories
+
+    - name: Install EPEL release package
+      ansible.builtin.dnf:
+        name: epel-release
+        state: present
+
+    - name: Enable EPEL repository with a priority of 10
+      ansible.builtin.yum_repository:
+        name: epel
+        file: epel
+        description: EPEL
+        baseurl:
+          - http://mirror.in2p3.fr/pub/linux/epel/$releasever/Everything/$basearch
+          - http://fr2.rpmfind.net/linux/epel/$releasever/Everything/$basearch
+          - http://mir01.syntis.net/epel/$releasever/Everything/$basearch
+        gpgcheck: true
+        gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-8
+        enabled: true
+        priority: 10
+
+    - name: Enable EPEL Modular repository with a priority of 10
+      ansible.builtin.yum_repository:
+        name: epel-modular
+        file: epel-modular
+        description: EPEL Modular
+        baseurl:
+          - http://mirror.in2p3.fr/pub/linux/epel/$releasever/Modular/$basearch
+          - http://fr2.rpmfind.net/linux/epel/$releasever/Modular/$basearch
+          - http://mir01.syntis.net/epel/$releasever/Modular/$basearch
+        gpgcheck: true
+        gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-8
+        enabled: true
+        priority: 10
+
+    - name: Disable unneeded EPEL repositories
+      ansible.builtin.file:
+        path: "{{item}}"
+        state: absent
+      loop:
+        - /etc/yum.repos.d/epel-testing.repo
+        - /etc/yum.repos.d/epel-testing-modular.repo
+
+    # Lynis repository
+
+    - name: Enable Lynis repository with a priority of 5
+      ansible.builtin.yum_repository:
+        name: lynis
+        file: lynis
+        description: Lynis
+        baseurl: https://packages.cisofy.com/community/lynis/rpm/
+        gpgcheck: true
+        gpgkey: https://packages.cisofy.com/keys/cisofy-software-rpms-public.key
+        enabled: true
+        priority: 5
+
+    # Complete set of command-line tools
+
+    - name: Install Core package group
+      ansible.builtin.dnf:
+        name: "@Core"
+        state: present
+
+    - name: Install Base package group
+      ansible.builtin.dnf:
+        name: "@Base"
+        state: present
+
+    - name: Install additional command-line tools
+      ansible.builtin.dnf:
+        name:
+          - acpid
+          - cowsay
+          - elinks
+          - fdupes
+          - figlet
+          - git
+          - glances
+          - iperf3
+          - lftp
+          - lynx
+          - lynis
+          - mailx
+          - mtools
+          - ncftp
+          - nmap
+          - ntfs-3g
+          - ntfsprogs
+          - ntpstat
+          - postfix
+          - recode
+          - rtorrent
+          - screen
+          - speedtest-cli
+          - tmux
+          - traceroute
+          - unrar-free
+          - whois
+        state: present
+
+    # Basic host configuration
+
+    - name: Set hostname
+      ansible.builtin.hostname:
+        name: "{{hostname}}"
+        use: systemd
+
+    - name: Configure hosts file
+      ansible.builtin.template:
+        src: hosts.j2
+        dest: /etc/hosts
+
+    # Configure Dnsmasq first to avoid a Catch 22 with DNS
+
+    - name: Install Dnsmasq
+      ansible.builtin.dnf:
+        name: dnsmasq
+        state: present
+
+    # TODO: Check out if Dnsmasq starts using the default configuration
+
+    - name: Make sure Dnsmasq is enabled and started
+      ansible.builtin.service:
+        name: dnsmasq
+        enabled: true
+        state: started
+
+    - name: Configure Dnsmasq
+      ansible.builtin.template:
+        src: dnsmasq.conf.j2
+        dest: /etc/dnsmasq.conf
+      notify: Restart Dnsmasq
+
+    # NetworkManager
+
+    - name: Make sure NetworkManager is installed
+      ansible.builtin.dnf:
+        name: NetworkManager
+        state: present
+
+    - name: Make sure NetworkManager is enabled and started
+      ansible.builtin.service:
+        name: NetworkManager
+        enabled: true
+        state: started
+
+    # Disable DNS processing & prevent NetworkManager from creating new
+    # connections
+
+    - name: Configure NetworkManager
+      ansible.builtin.copy:
+        dest: /etc/NetworkManager/conf.d/90-custom.conf
+        owner: root
+        group: root
+        mode: 0644
+        content: |
+          [main]
+          dns=none
+          rc-manager=unmanaged
+          no-auto-default=*
+      notify: Reload NetworkManager configuration
+
+    - name: Configure WAN network interface
+      community.general.nmcli:
+        type: ethernet
+        conn_name: WAN
+        ifname: "{{interface_wan}}"
+        method4: manual
+        ip4: "{{address_wan}}/{{prefix_wan}}"
+        gw4: "{{gateway_wan}}"
+        method6: disabled
+        state: present
+        autoconnect: true
+      notify: Bring up WAN network interface
+
+    - name: Configure LAN network interface
+      community.general.nmcli:
+        type: ethernet
+        conn_name: LAN
+        ifname: "{{interface_lan}}"
+        method4: manual
+        ip4: "{{address_lan}}/{{prefix_lan}}"
+        method6: disabled
+        state: present
+        autoconnect: true
+      notify: Bring up LAN network interface
+
+    - name: Clean up NetworkManager connections
+      community.general.nmcli:
+        type: ethernet
+        conn_name: "{{item}}"
+        state: absent
+      loop:
+        - enp1s0
+        - enp2s0
+        - enp3s0
+
+    # We can do that now that Dnsmasq is up and running
+
+    - name: Configure DNS
+      ansible.builtin.copy:
+        dest: /etc/resolv.conf
+        content: |
+          # /etc/resolv.conf
+          nameserver 127.0.0.1
+
+    # Disable IPv6
+
+    - name: Disable IPv6 in the kernel parameters
+      ansible.posix.sysctl:
+        name: "{{item}}"
+        value: "1"
+        reload: true
+      loop:
+        - net.ipv6.conf.all.disable_ipv6
+        - net.ipv6.conf.default.disable_ipv6
+        - net.ipv6.conf.lo.disable_ipv6
+
+    - name: Configure SSH for IPv4 only
+      ansible.builtin.replace:
+        path: /etc/ssh/sshd_config
+        regexp: "{{item.from}}"
+        replace: "{{item.to}}"
+      loop:
+        - from: "^#AddressFamily any"
+          to: "AddressFamily inet"
+        - from: "^#ListenAddress 0.0.0.0"
+          to: "ListenAddress 0.0.0.0"
+      notify: Reload SSH configuration
+
+  handlers:
+
+    # SELinux
+
+    - name: Relabel filesystem
+      ansible.builtin.file:
+        path: /.autorelabel
+        state: touch
+
+    # NetworkManager
+
+    - name: Reload NetworkManager configuration
+      ansible.builtin.service:
+        name: NetworkManager
+        state: reloaded
+
+    - name: Bring up WAN network interface
+      ansible.builtin.command:
+        cmd: nmcli con up WAN
+      changed_when: false
+
+    - name: Bring up LAN network interface
+      ansible.builtin.command:
+        cmd: nmcli con up LAN
+
+    # SSH
+
+    - name: Reload SSH configuration
+      ansible.builtin.service:
+        name: sshd
+        state: reloaded
+
+    # Dnsmasq
+
+    - name: Restart Dnsmasq
+      ansible.builtin.service:
+        name: dnsmasq
+        state: restarted
+
+...
