@@ -354,7 +354,7 @@
 
     # We're using Dnsmasq's default configuration at first to fire it up and
     # maintain an Internet connection but we'll switch to our own custom
-    # configuration in the next step 
+    # configuration in the next step
 
     - name: Make sure Dnsmasq is enabled and started
       ansible.builtin.service:
@@ -464,6 +464,16 @@
         - from: "^#ListenAddress 0.0.0.0"
           to: "ListenAddress 0.0.0.0"
       notify: Reload SSH configuration
+
+    # Execute ansible-pull every 10 minutes
+
+    - name: Install ansible-pull cronjob
+      ansible.builtin.cron:
+        user: root
+        name: Provisioned by Ansible
+        minute: "*/10"
+        job: "/usr/bin/ansible-pull -o -U https://github.com/kikinovak/\
+              microlinux-squidbox-el8.git > /dev/null"
 
   handlers:
 
