@@ -2,7 +2,7 @@
 
 - [ ] Supprimer les avertissements `Could not match supplied host pattern`
 
-- [ ] Configurer GRUB
+- [x] Configurer GRUB
 
 - [ ] Installer et configurer un client Icinga
 
