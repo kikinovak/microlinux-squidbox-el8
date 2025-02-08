@@ -73,6 +73,9 @@ Effectuer la mise à jour initiale :
 # dnf update -y
 ```
 
+> On peut éventuellement se passer de la mise à jour initiale vu que c'est DNF
+> Automatic qui s'en chargera après l'installation.
+
 Redémarrer :
 
 ```
