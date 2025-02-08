@@ -588,6 +588,31 @@
         mode: 0644
       notify: Restart Postfix
 
+    # DNF Automatic
+
+    - name: Install DNF Automatic
+      ansible.builtin.dnf:
+        name: dnf-automatic
+        state: present
+
+    - name: Configure DNF Automatic
+      ansible.builtin.template:
+        src: automatic.conf.j2
+        dest: /etc/dnf/automatic.conf
+        owner: root
+        group: root
+        mode: 0644
+      notify: Setup systemd timer for DNF Automatic
+
+    - name: "Reboot every Monday at 03:30"
+      ansible.builtin.cron:
+        name: "Reboot every Monday at 03:30"
+        weekday: "01"
+        minute: "30"
+        hour: "03"
+        user: root
+        job: "/usr/bin/systemctl reboot"
+
     # # Execute ansible-pull every 10 minutes
 
     # - name: Install ansible-pull cronjob
@@ -658,5 +683,13 @@
     - name: Create hash database for sasl_passwd file
       ansible.builtin.command:
         cmd: postmap /etc/postfix/sasl_passwd
+
+    # DNF Automatic
+
+    - name: Setup systemd timer for DNF Automatic
+      ansible.builtin.systemd_service:
+        name: dnf-automatic.timer
+        state: started
+        enabled: true
 
 ...

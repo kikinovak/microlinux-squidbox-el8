@@ -12,7 +12,7 @@
 
 - [x] Synchronisation NTP
 
-- [ ] DNF automatic
+- [x] DNF automatic
 
 - [ ] Dnsmasq
 
