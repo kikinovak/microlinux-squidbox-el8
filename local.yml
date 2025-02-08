@@ -541,6 +541,53 @@
         mode: 0644
       notify: Restart Chrony
 
+    # Postfix
+
+    - name: Make sure Postfix and related tools are installed
+      ansible.builtin.dnf:
+        name: "{{item}} "
+        state: present
+      loop:
+        - cyrus-sasl-plain
+        - cyrus-sasl-gssapi
+        - cyrus-sasl-lib
+        - postfix
+        - mailx
+
+    - name: Configure mail relay user
+      ansible.builtin.template:
+        src: sasl_passwd.j2
+        dest: /etc/postfix/sasl_passwd
+        owner: root
+        group: root
+        mode: 0400
+      notify: Create hash database for sasl_passwd file
+
+    - name: Configure mail address for root
+      ansible.builtin.replace:
+        path: /etc/aliases
+        regexp: "^#root:\t\tmarc$"
+        replace: "root\t\t{{mail_root}}"
+      notify: Update aliases database
+
+    # We're using Postfix' default configuration at first to fire it up but
+    # we'll switch to our own custom configuration in the next step
+
+    - name: Make sure Postfix is enabled and started
+      ansible.builtin.service:
+        name: postfix
+        enabled: true
+        state: started
+
+    - name: Configure Postfix
+      ansible.builtin.template:
+        src: main.cf.j2
+        dest: /etc/postfix/main.cf
+        owner: root
+        group: root
+        mode: 0644
+      notify: Restart Postfix
+
     # # Execute ansible-pull every 10 minutes
 
     # - name: Install ansible-pull cronjob
@@ -596,5 +643,20 @@
       ansible.builtin.service:
         name: chronyd
         state: restarted
+
+    # Postfix
+
+    - name: Restart Postfix
+      ansible.builtin.service:
+        name: postfix
+        state: restarted
+
+    - name: Update aliases database
+      ansible.builtin.command:
+        cmd: newaliases
+
+    - name: Create hash database for sasl_passwd file
+      ansible.builtin.command:
+        cmd: postmap /etc/postfix/sasl_passwd
 
 ...

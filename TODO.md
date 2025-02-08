@@ -8,7 +8,7 @@
 
 - [x] Configurer FirewallD
 
-- [ ] Postfix minimal pour l'envoi de mails
+- [x] Postfix minimal pour l'envoi de mails
 
 - [x] Synchronisation NTP
 
