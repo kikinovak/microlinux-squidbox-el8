@@ -80,6 +80,8 @@
         mode: 0644
       notify: Update GRUB
 
+    - meta: flush_handlers
+
     # SELinux
 
     - name: Enable SELinux in enforcing mode
@@ -87,6 +89,8 @@
         policy: targeted
         state: enforcing
       notify: Relabel filesystem
+
+    - meta: flush_handlers
 
     # Setup root account
 
@@ -380,6 +384,8 @@
         dest: /etc/dnsmasq.conf
       notify: Restart Dnsmasq
 
+    - meta: flush_handlers
+
     # NetworkManager
 
     - name: Make sure NetworkManager is installed
@@ -409,6 +415,8 @@
           no-auto-default=*
       notify: Reload NetworkManager configuration
 
+    - meta: flush_handlers
+
     - name: Configure WAN network interface
       community.general.nmcli:
         type: ethernet
@@ -422,6 +430,8 @@
         autoconnect: true
       notify: Bring up WAN network interface
 
+    - meta: flush_handlers
+
     - name: Configure LAN network interface
       community.general.nmcli:
         type: ethernet
@@ -433,6 +443,8 @@
         state: present
         autoconnect: true
       notify: Bring up LAN network interface
+
+    - meta: flush_handlers
 
     - name: Clean up NetworkManager connections
       community.general.nmcli:
@@ -453,6 +465,8 @@
           # /etc/resolv.conf
           nameserver 127.0.0.1
       notify: Restart Dnsmasq
+
+    - meta: flush_handlers
 
     # Disable IPv6
 
@@ -477,6 +491,8 @@
         - from: "^#ListenAddress 0.0.0.0"
           to: "ListenAddress 0.0.0.0"
       notify: Reload SSH configuration
+
+    - meta: flush_handlers
 
     # FirewallD
 
@@ -553,6 +569,8 @@
         mode: 0644
       notify: Restart Chrony
 
+    - meta: flush_handlers
+
     # Postfix
 
     - name: Make sure Postfix and related tools are installed
@@ -575,12 +593,16 @@
         mode: 0400
       notify: Create hash database for sasl_passwd file
 
+    - meta: flush_handlers
+
     - name: Configure mail address for root
       ansible.builtin.replace:
         path: /etc/aliases
         regexp: "^#root:\t\tmarc$"
         replace: "root\t\t{{mail_root}}"
       notify: Update aliases database
+
+    - meta: flush_handlers
 
     # We're using Postfix' default configuration at first to fire it up but
     # we'll switch to our own custom configuration in the next step
@@ -600,6 +622,8 @@
         mode: 0644
       notify: Restart Postfix
 
+    - meta: flush_handlers
+
     # DNF Automatic
 
     - name: Install DNF Automatic
@@ -615,6 +639,8 @@
         group: root
         mode: 0644
       notify: Setup systemd timer for DNF Automatic
+
+    - meta: flush_handlers
 
     - name: "Reboot every Monday at 03:30"
       ansible.builtin.cron:
