@@ -49,9 +49,32 @@
         mode: 0400
       notify: Create hash database for sasl_passwd file
 
+    # We're using Postfix' default configuration at first to fire it up but
+    # we'll switch to our own custom configuration in the next step
+
+    - name: Make sure Postfix is enabled and started
+      ansible.builtin.service:
+        name: postfix
+        enabled: true
+        state: started
+
+    - name: Configure Postfix
+      ansible.builtin.template:
+        src: main.cf.j2
+        dest: /etc/postfix/main.cf
+        owner: root
+        group: root
+        mode: 0644
+      notify: Restart Postfix
+
   handlers:
     
     # Postfix
+
+    - name: Restart Postfix
+      ansible.builtin.service:
+        name: postfix
+        state: restarted
 
     - name: Create hash database for sasl_passwd file
       ansible.builtin.command:
