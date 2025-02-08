@@ -49,6 +49,13 @@
         mode: 0400
       notify: Create hash database for sasl_passwd file
 
+    - name: Configure mail address for root
+      ansible.builtin.replace:
+        path: /etc/aliases
+        regexp: "^#root:\t\tmarc$"
+        replace: "root\t\t{{mail_root}}"
+      notify: Update aliases database
+
     # We're using Postfix' default configuration at first to fire it up but
     # we'll switch to our own custom configuration in the next step
 
@@ -75,6 +82,10 @@
       ansible.builtin.service:
         name: postfix
         state: restarted
+
+    - name: Update aliases database
+      ansible.builtin.command:
+        cmd: newaliases
 
     - name: Create hash database for sasl_passwd file
       ansible.builtin.command:
