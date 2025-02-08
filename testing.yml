@@ -55,6 +55,7 @@
     - name: Enable IP masquerading
       ansible.posix.firewalld:
         masquerade: true
+        state: enabled
         zone: internal
         permanent: true
         immediate: true
