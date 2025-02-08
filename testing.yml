@@ -55,8 +55,9 @@
     - name: Enable IP masquerading
       ansible.posix.firewalld:
         masquerade: true
-        state: enabled
+        zone: internal
         permanent: true
+        immediate: true
 
     - name: Remove all predefined services except SSH from internal zone
       ansible.posix.firewalld:
