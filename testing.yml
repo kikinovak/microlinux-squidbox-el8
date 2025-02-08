@@ -1,0 +1,45 @@
+---  # local.yml
+
+- hosts: localhost
+
+  # Variables in order of appearance
+
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    firstuser_login: microlinux
+    firstuser_name: Microlinux
+    hostname: squidbox
+    domain_lan: sandbox.lan
+    interface_wan: enp1s0
+    address_wan: "{{ansible_default_ipv4.address}}"
+    prefix_wan: "{{ansible_default_ipv4.prefix}}"
+    gateway_wan: "{{ansible_default_ipv4.gateway}}"
+    interface_lan: enp2s0
+    network_lan: 192.168.3.0/24
+    address_lan: 192.168.3.1
+    prefix_lan: 24
+    dns1: 1.1.1.1
+    dns2: 1.0.0.1
+
+  tasks:
+
+    # GRUB
+
+    - name: Configure GRUB
+      ansible.builtin.copy:
+        src: grub
+        dest: /etc/default/grub
+        owner: root
+        group: root
+        mode: 0644
+      notify: Update GRUB
+
+  handlers:
+
+    # GRUB
+
+    - name: Update GRUB
+      ansible.builtin.command:
+        cmd: grub2-mkconfig -o /boot/grub2/grub.cfg 
+
+...
