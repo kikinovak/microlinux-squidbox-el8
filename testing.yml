@@ -82,6 +82,7 @@
         immediate: true
       loop:
         - dns
+        - dhcp
         - ntp
 
   handlers:
