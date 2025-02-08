@@ -1,0 +1,155 @@
+---  # local.yml
+
+- hosts: localhost
+
+  # Variables in order of appearance
+
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    firstuser_login: microlinux
+    firstuser_name: Microlinux
+    hostname: squidbox
+    domain_lan: sandbox.lan
+    interface_wan: enp1s0
+    address_wan: "{{ansible_default_ipv4.address}}"
+    prefix_wan: "{{ansible_default_ipv4.prefix}}"
+    gateway_wan: "{{ansible_default_ipv4.gateway}}"
+    interface_lan: enp2s0
+    network_lan: 192.168.3.0/24
+    address_lan: 192.168.3.1
+    prefix_lan: 24
+    dns1: 1.1.1.1
+    dns2: 1.0.0.1
+
+  tasks:
+
+    # FirewallD
+
+    - name: Make sure FirewallD is installed
+      ansible.builtin.dnf:
+        name: firewalld
+        state: present
+
+    - name: Make sure FirewallD is enabled and started
+      ansible.builtin.service:
+        name: firewalld
+        enabled: true
+        state: started
+
+    - name: Associate external zone to WAN network interface
+      ansible.posix.firewalld:
+        zone: external
+        interface: "{{interface_wan}}"
+        state: enabled
+        permanent: true
+        immediate: true
+
+    - name: Associate internal zone to LAN network interface
+      ansible.posix.firewalld:
+        zone: internal
+        interface: "{{interface_lan}}"
+        masquerade: true
+        state: enabled
+        permanent: true
+        immediate: true
+
+    - name: Remove all predefined services except SSH from internal zone
+      ansible.posix.firewalld:
+        zone: internal
+        service: "{{item}}"
+        state: disabled
+        permanent: true
+        immediate: true
+      loop:
+        - cockpit
+        - dhcpv6-client
+        - mdns
+        - samba-client
+
+    - name: Allow DNS & NTP
+      ansible.posix.firewalld:
+        zone: internal
+        service: "{{item}}"
+        state: enabled
+        permanent: true
+        immediate: true
+      loop:
+        - dns
+        - ntp
+
+  handlers:
+
+    # GRUB
+
+    - name: Update GRUB
+      ansible.builtin.command:
+        cmd: grub2-mkconfig -o /boot/grub2/grub.cfg
+
+    # SELinux
+
+    - name: Relabel filesystem
+      ansible.builtin.file:
+        path: /.autorelabel
+        state: touch
+
+    # NetworkManager
+
+    - name: Reload NetworkManager configuration
+      ansible.builtin.service:
+        name: NetworkManager
+        state: reloaded
+
+    - name: Bring up WAN network interface
+      ansible.builtin.command:
+        cmd: nmcli con up WAN
+      changed_when: false
+
+    - name: Bring up LAN network interface
+      ansible.builtin.command:
+        cmd: nmcli con up LAN
+
+    # SSH
+
+    - name: Reload SSH configuration
+      ansible.builtin.service:
+        name: sshd
+        state: reloaded
+
+    # Dnsmasq
+
+    - name: Restart Dnsmasq
+      ansible.builtin.service:
+        name: dnsmasq
+        state: restarted
+
+    # Chrony
+
+    - name: Restart Chrony
+      ansible.builtin.service:
+        name: chronyd
+        state: restarted
+
+    # Postfix
+
+    - name: Restart Postfix
+      ansible.builtin.service:
+        name: postfix
+        state: restarted
+
+    - name: Update aliases database
+      ansible.builtin.command:
+        cmd: newaliases
+
+    - name: Create hash database for sasl_passwd file
+      ansible.builtin.command:
+        cmd: postmap /etc/postfix/sasl_passwd
+
+    # DNF Automatic
+
+    - name: Setup systemd timer for DNF Automatic
+      ansible.builtin.systemd_service:
+        name: dnf-automatic.timer
+        state: started
+        enabled: true
+
+...
