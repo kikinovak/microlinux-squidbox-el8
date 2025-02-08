@@ -516,6 +516,7 @@
       ansible.posix.firewalld:
         zone: external
         interface: "{{interface_wan}}"
+        masquerade: true
         state: enabled
         permanent: true
         immediate: true
@@ -524,6 +525,7 @@
       ansible.posix.firewalld:
         zone: internal
         interface: "{{interface_lan}}"
+        masquerade: true
         state: enabled
         permanent: true
         immediate: true
