@@ -532,6 +532,7 @@
       ansible.posix.firewalld:
         masquerade: true
         state: enabled
+        zone: internal
         permanent: true
         immediate: true
 
@@ -557,6 +558,7 @@
         immediate: true
       loop:
         - dns
+        - dhcp
         - ntp
 
     # FirewallD
