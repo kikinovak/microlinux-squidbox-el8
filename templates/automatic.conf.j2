@@ -1,0 +1,17 @@
+# /etc/dnf/automatic.conf
+
+[commands]
+upgrade_type = default
+random_sleep = 0
+network_online_timeout = 60
+download_updates = yes
+apply_updates = yes
+
+[emitters]
+system_name = {{hostname}}.{{domain_lan}}
+emit_via = email
+
+[email]
+email_from = root@{{hostname}}.{{domain_lan}}
+email_to = {{mail_root}}
+email_host = localhost
