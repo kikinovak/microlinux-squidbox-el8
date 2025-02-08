@@ -452,6 +452,7 @@
         content: |
           # /etc/resolv.conf
           nameserver 127.0.0.1
+      notify: Restart Dnsmasq
 
     # Disable IPv6
 
