@@ -524,6 +524,12 @@
       ansible.posix.firewalld:
         zone: internal
         interface: "{{interface_lan}}"
+        state: enabled
+        permanent: true
+        immediate: true
+
+    - name: Enable IP masquerading
+      ansible.posix.firewalld:
         masquerade: true
         state: enabled
         permanent: true
@@ -657,15 +663,15 @@
         user: root
         job: "/usr/bin/systemctl reboot"
 
-    # # Execute ansible-pull every 10 minutes
+  # # Execute ansible-pull every 10 minutes
 
-    # - name: Install ansible-pull cronjob
-    #   ansible.builtin.cron:
-    #   user: root
-    #   name: Provisioned by Ansible
-    #   minute: "*/10"
-    #   job: "/usr/bin/ansible-pull -o -U https://github.com/kikinovak/\
-    #   microlinux-squidbox-el8.git > /dev/null"
+  # - name: Install ansible-pull cronjob
+  #   ansible.builtin.cron:
+  #   user: root
+  #   name: Provisioned by Ansible
+  #   minute: "*/10"
+  #   job: "/usr/bin/ansible-pull -o -U https://github.com/kikinovak/\
+  #   microlinux-squidbox-el8.git > /dev/null"
 
   handlers:
 
@@ -673,7 +679,7 @@
 
     - name: Update GRUB
       ansible.builtin.command:
-        cmd: grub2-mkconfig -o /boot/grub2/grub.cfg 
+        cmd: grub2-mkconfig -o /boot/grub2/grub.cfg
 
     # SELinux
 
