@@ -428,6 +428,7 @@
         method6: disabled
         state: present
         autoconnect: true
+        zone: external
       notify: Bring up WAN network interface
 
     - meta: flush_handlers
@@ -442,6 +443,7 @@
         method6: disabled
         state: present
         autoconnect: true
+        zone: internal
       notify: Bring up LAN network interface
 
     - meta: flush_handlers
