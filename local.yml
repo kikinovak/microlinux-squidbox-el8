@@ -417,6 +417,9 @@
 
     - meta: flush_handlers
 
+    # FirewallD zones are also configured here, otherwise Ansible's FirewallD
+    # module fails to assign them permanently to their respective interfaces
+
     - name: Configure WAN network interface
       community.general.nmcli:
         type: ethernet
