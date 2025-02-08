@@ -48,6 +48,12 @@
       ansible.posix.firewalld:
         zone: internal
         interface: "{{interface_lan}}"
+        state: enabled
+        permanent: true
+        immediate: true
+
+    - name: Enable IP masquerading
+      ansible.posix.firewalld:
         masquerade: true
         state: enabled
         permanent: true
