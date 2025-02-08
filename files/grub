@@ -4,5 +4,5 @@ GRUB_DEFAULT=saved
 GRUB_DISABLE_SUBMENU=false
 GRUB_TERMINAL_OUTPUT="serial console"
 GRUB_SERIAL_COMMAND="serial --unit=0 --speed=115200 --word=8 --parity=no --stop=1"
-GRUB_CMDLINE_LINUX="nomodeset edd=off console=ttyS0,115200n8"
+GRUB_CMDLINE_LINUX="nomodeset quiet edd=off console=ttyS0,115200n8"
 GRUB_DISABLE_RECOVERY="true"
