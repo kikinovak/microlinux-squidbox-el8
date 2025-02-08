@@ -23,6 +23,10 @@
 
   tasks:
 
+    - name: Include encrypted variables
+      ansible.builtin.include_vars:
+        file: vars/secret.yml
+
     - name: Install DNF Automatic
       ansible.builtin.dnf:
         name: dnf-automatic
