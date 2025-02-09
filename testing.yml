@@ -17,4 +17,39 @@
         permanent: true
         immediate: true
 
+    - name: Import Icinga repository GPG key
+      ansible.builtin.rpm_key:
+        key: https://packages.icinga.com/icinga.key
+        state: present
+
+    - name: Install Icinga repository release package
+      ansible.builtin.dnf:
+        name: "https://packages.icinga.com/epel/\
+              icinga-rpm-release-8-latest.noarch.rpm"
+        state: present
+
+    - meta: end_play
+
+    - name: Rename Icinga repository
+      ansible.builtin.yum_repository:
+        name: icinga-stable-release
+        file: ICINGA-release
+        state: absent
+
+    - name: Enable Icinga repository with a priority of 10
+      ansible.builtin.yum_repository:
+        name: icinga
+        file: ICINGA-release
+        description: Icinga
+        baseurl:
+          - https://packages.icinga.com/epel/$releasever/release/
+        gpgcheck: true
+        gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-ICINGA
+        enabled: true
+        priority: 10
+
+    - name: Disable Icinga Snapshot repository
+      ansible.builtin.file:
+        path: /etc/yum.repos.d/ICINGA-snapshot.repo
+        state: absent
 ...
