@@ -4,10 +4,14 @@
 
   # Variables in order of appearance
 
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
   tasks:
 
     - name: Open port 5665/tcp for Icinga
       ansible.posix.firewalld:
+        zone: internal
         port: 5665/tcp
         state: enabled
         permanent: true
