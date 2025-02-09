@@ -1,0 +1,16 @@
+---  # testing.yml
+
+- hosts: localhost
+
+  # Variables in order of appearance
+
+  tasks:
+
+    - name: Open port 5665/tcp for Icinga
+      ansible.posix.firewalld:
+        port: 5665/tcp
+        state: enabled
+        permanent: true
+        immediate: true
+
+...
