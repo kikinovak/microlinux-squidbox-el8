@@ -22,13 +22,13 @@
         key: https://packages.icinga.com/icinga.key
         state: present
 
+    - meta: end_play
+
     - name: Install Icinga repository release package
       ansible.builtin.dnf:
         name: "https://packages.icinga.com/epel/\
               icinga-rpm-release-8-latest.noarch.rpm"
         state: present
-
-    - meta: end_play
 
     - name: Rename Icinga repository
       ansible.builtin.yum_repository:
