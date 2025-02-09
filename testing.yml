@@ -22,6 +22,18 @@
         key: https://packages.icinga.com/icinga.key
         state: present
 
+    - name: Enable Icinga repository with a priority of 10
+      ansible.builtin.yum_repository:
+        name: icinga
+        file: icinga
+        description: Icinga
+        baseurl: 
+          - https://packages.icinga.com/subscription/rhel/$releasever/release/
+        gpgcheck: true
+        gpgkey: https://packages.icinga.com/icinga.key
+        enabled: true
+        priority: 10
+
     - meta: end_play
 
     - name: Install Icinga repository release package
