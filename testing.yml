@@ -43,7 +43,7 @@
     - name: Redirect port 80 to 3128
       ansible.posix.firewalld:
         rich_rule: "rule family=ipv4 forward-port port=80 protocol=tcp \
-                    to-port=3128"
+                    to-port=3128 to-addr={{address_lan}}"
         zone: internal
         state: enabled
         permanent: true
