@@ -52,6 +52,18 @@
         permanent: true
         immediate: true
 
+    - name: Forward port 443 to 3129
+      ansible.posix.firewalld:
+        zone: internal
+        port_forward:
+          - port: 443
+            proto: tcp
+            toport: 3129
+            toaddr: "{{address_lan}}"
+        state: enabled
+        permanent: true
+        immediate: true
+
     - name: Install Squid
       ansible.builtin.dnf:
         name: squid
