@@ -41,5 +41,8 @@
       ansible.builtin.template:
         src: squid.conf.j2
         dest: /etc/squid/squid.conf
+        owner: root
+        group: squid
+        mode: 0640
 
 ...
