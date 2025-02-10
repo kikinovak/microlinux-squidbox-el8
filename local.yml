@@ -561,7 +561,7 @@
         - dhcp
         - ntp
 
-    # FirewallD
+    # Chrony
 
     - name: Make sure Chrony is installed
       ansible.builtin.dnf:
