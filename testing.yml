@@ -47,7 +47,7 @@
           port: 80
           proto: tcp
           toport: 3128
-          toaddr: {{address_lan}}
+          toaddr: "{{address_lan}}"
         state: enabled
         permanent: true
         immediate: true
