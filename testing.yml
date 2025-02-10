@@ -37,6 +37,12 @@
         name: squid
         state: present
 
+    - name: Make sure Squid is enabled and started
+      ansible.builtin.service:
+        name: squid
+        enabled: true
+        state: started
+
     - name: Configure Squid
       ansible.builtin.template:
         src: squid.conf.j2
@@ -44,5 +50,13 @@
         owner: root
         group: squid
         mode: 0640
+      notify: Restart Squid
+
+  handlers:
+
+    - name: Restart Squid
+      ansible.builtin.service:
+        name: squid
+        state: restarted
 
 ...
