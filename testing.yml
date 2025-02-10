@@ -20,6 +20,7 @@
     prefix_lan: 24
     dns1: 1.1.1.1
     dns2: 1.0.0.1
+    cache_mem: 256 MB
 
   tasks:
 
