@@ -23,4 +23,22 @@
 
   tasks:
 
+    - name: Open port 3128 for Squid
+      ansible.posix.firewalld:
+        zone: internal
+        service: squid
+        state: enabled
+        permanent: true
+        immediate: true
+
+    - name: Install Squid
+      ansible.builtin.dnf:
+        name: squid
+        state: present
+
+    - name: Configure Squid
+      ansible.builtin.template:
+        src: squid.conf.j2
+        dest: /etc/squid/squid.conf
+
 ...
