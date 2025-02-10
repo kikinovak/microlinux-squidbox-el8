@@ -32,6 +32,14 @@
         permanent: true
         immediate: true
 
+    - name: Open port 3129 for Squid
+      ansible.posix.firewalld:
+        zone: internal
+        port: 3129/tcp
+        state: enabled
+        permanent: true
+        immediate: true
+
     - name: Install Squid
       ansible.builtin.dnf:
         name: squid
