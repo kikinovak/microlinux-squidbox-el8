@@ -109,6 +109,12 @@
               -outform DER -out /etc/squid/ssl_cert/certificat.der"
         creates: /etc/squid/ssl_cert/certificat.der
 
+    - name: Create Squid certificate cache
+      ansible.builtin.command:
+        cmd: "runuser -u squid -- /usr/lib64/squid/security_file_certgen \
+              -c -s /var/spool/squid/ssl_db -M 64MB"
+        creates: /var/spool/squid/ssl_db/index.txt
+      
   handlers:
 
     - name: Restart Squid
