@@ -101,6 +101,7 @@
               -out /etc/squid/ssl_cert/certificat.pem \
               -subj '/C=FR/ST=Gard/L=Montpezat/\
               O=Microlinux/OU=IT/CN={{hostname}}.{{domain_lan}}'"
+      creates: /etc/squid/ssl_cert/certificat.pem
 
   handlers:
 
