@@ -24,8 +24,22 @@ http_access allow localnet
 http_access allow localhost
 http_access deny all
 
-# Listen to port 3128
-http_port 3128
+# Ports
+http_port 3130
+http_port 3128 intercept
+https_port 3129 intercept ssl-bump \
+  cert=/etc/squid/ssl_cert/certificat.pem \
+  generate-host-certificates=on \
+  dynamic_cert_mem_cache_size=64MB
+
+# SSL certificate generation
+sslcrtd_program /usr/lib64/squid/security_file_certgen -s /var/spool/squid/ssl_db -M 64MB
+sslcrtd_children 32 startup=5 idle=1
+
+# SSL-Bump
+acl step1 at_step SslBump1
+ssl_bump peek step1
+ssl_bump bump all
 
 # Cache size
 cache_mem {{cache_mem}}
