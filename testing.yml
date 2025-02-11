@@ -99,8 +99,9 @@
         provider: selfsigned
         selfsigned_version: 3
         selfsigned_digest: sha256
-        valid_in: "+3650d"
-        selfsigned_subject: 
+        selfsigned_not_after: "+3650d"
+        selfsigned_not_before: "-1d"
+        subject: 
           C: FR
           ST: Gard
           L: Montpezat
