@@ -100,7 +100,7 @@
               -keyout /etc/squid/ssl_cert/certificat.pem \
               -out /etc/squid/ssl_cert/certificat.pem \
               -subj '/C=FR/ST=Gard/L=Montpezat/\
-              O=Microlinux/OU=IT/CN=squidbox.sandbox.lan'"
+              O=Microlinux/OU=IT/CN={{hostname}}.{{domain_lan}}'"
 
   handlers:
 
