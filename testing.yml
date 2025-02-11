@@ -92,22 +92,23 @@
         group: squid
         mode: 0755
 
-    - name: Generate self-signed certificate
+    - name: Create certificate signing request (CSR) for self-signed certificate
+      community.crypto.openssl_csr_pipe:
+        privatekey_path: /etc/squid/ssl_cert/certificate.key
+        common_name: ansible.com
+        organization_name: Ansible, Inc.
+        subject_alt_name:
+          - "DNS:ansible.com"
+          - "DNS:www.ansible.com"
+          - "DNS:docs.ansible.com"
+      register: csr
+
+    - name: Create self-signed certificate from CSR
       community.crypto.x509_certificate:
-        path: /etc/squid/ssl_cert/certificat.pem
-        privatekey_path: /etc/squid/ssl_cert/certificat.pem
+        path: /etc/squid/ssl_cert/certificate.pem
+        csr_content: "{{csr.csr}}"
+        privatekey_path: /etc/squid/ssl_cert/certificate.key
         provider: selfsigned
-        selfsigned_version: 3
-        selfsigned_digest: sha256
-        selfsigned_not_after: "+3650d"
-        selfsigned_not_before: "-1d"
-        subject: 
-          C: FR
-          ST: Gard
-          L: Montpezat
-          O: Microlinux
-          CN: squidbox.sandbox.lan
-          emailAddress: info@microlinux.fr
 
   handlers:
 
