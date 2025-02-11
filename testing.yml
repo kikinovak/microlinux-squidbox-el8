@@ -96,8 +96,8 @@
       ansible.builtin.command:
         cmd: "openssl req -new -newkey rsa:4096 -sha256 -days 3650 -nodes \
               -x509 -extensions v3_ca -keyout certificat.pem \
-              -out certificat.pem -subj "/C=FR/ST=Gard/L=Montpezat/\
-              O=Microlinux/OU=IT/CN=squidbox.sandbox.lan"
+              -out certificat.pem -subj '/C=FR/ST=Gard/L=Montpezat/\
+              O=Microlinux/OU=IT/CN=squidbox.sandbox.lan'"
 
   handlers:
 
