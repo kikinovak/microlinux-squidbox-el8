@@ -84,6 +84,14 @@
         mode: 0640
       notify: Restart Squid
 
+    - name: Create certificate directory
+      ansible.builtin.file:
+        path: /etc/squid/ssl_cert
+        state: directory
+        owner: squid
+        group: squid
+        mode: 0755
+
   handlers:
 
     - name: Restart Squid
