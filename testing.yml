@@ -99,7 +99,7 @@
         provider: selfsigned
         selfsigned_version: 3
         selfsigned_digest: sha256
-        selfsigned_day: 3650
+        valid_in: "+3650d"
         selfsigned_subject: 
           C: FR
           ST: Gard
