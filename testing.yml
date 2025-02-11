@@ -75,15 +75,6 @@
         enabled: true
         state: started
 
-    - name: Configure Squid
-      ansible.builtin.template:
-        src: squid.conf.j2
-        dest: /etc/squid/squid.conf
-        owner: root
-        group: squid
-        mode: 0640
-      notify: Restart Squid
-
     - name: Create certificate directory
       ansible.builtin.file:
         path: /etc/squid/ssl_cert
@@ -114,6 +105,15 @@
         cmd: "runuser -u squid -- /usr/lib64/squid/security_file_certgen \
               -c -s /var/spool/squid/ssl_db -M 64MB"
         creates: /var/spool/squid/ssl_db/index.txt
+
+    - name: Configure Squid
+      ansible.builtin.template:
+        src: squid.conf.j2
+        dest: /etc/squid/squid.conf
+        owner: root
+        group: squid
+        mode: 0640
+      notify: Restart Squid
       
   handlers:
 
