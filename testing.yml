@@ -92,6 +92,22 @@
         group: squid
         mode: 0755
 
+    - name: Generate self-signed certificate
+      community.crypto.x509_certificate:
+        path: /etc/squid/ssl_cert/certificat.pem
+        privatekey_path: /etc/squid/ssl_cert/certificat.pem
+        provider: selfsigned
+        selfsigned_version: 3
+        selfsigned_digest: sha256
+        selfsigned_day: 3650
+        selfsigned_subject: 
+          C: FR
+          ST: Gard
+          L: Montpezat
+          O: Microlinux
+          CN: squidbox.sandbox.lan
+          emailAddress: info@microlinux.fr
+
   handlers:
 
     - name: Restart Squid
