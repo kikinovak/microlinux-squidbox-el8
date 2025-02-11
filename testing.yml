@@ -103,6 +103,12 @@
               O=Microlinux/OU=IT/CN={{hostname}}.{{domain_lan}}'"
         creates: /etc/squid/ssl_cert/certificat.pem
 
+    - name: Create DER-encoded certificate
+      ansible.builtin.command:
+        cmd: "openssl x509 -in /etc/squid/ssl_cert/certificat.pem \
+              -outform DER -out /etc/squid/ssl_cert/certificat.der"
+        creates: /etc/squid/ssl_cert/certificat.der
+
   handlers:
 
     - name: Restart Squid
