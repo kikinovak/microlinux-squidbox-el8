@@ -137,6 +137,13 @@
         group: squid
         mode: 0640
       notify: Restart Squid
+
+    - name: Install SquidAnalyzer
+      ansible.builtin.dnf:
+        name:
+          - squidanalyzer
+          - perl-Time-HiRes
+        state: present
       
   handlers:
 
