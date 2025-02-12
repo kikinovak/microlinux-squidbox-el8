@@ -186,6 +186,14 @@
         mode: 0644
       notify: Restart Apache
 
+    - name: Configure SquidAnalyzer
+      ansible.builtin.template:
+        src: squidanalyzer.conf.j2
+        dest: /etc/squidanalyzer/squidanalyzer.conf
+        owner: root
+        group: root
+        mode: 0644
+
   handlers:
 
     - name: Restart Squid
