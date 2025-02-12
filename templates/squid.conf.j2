@@ -36,9 +36,11 @@ https_port 3129 intercept ssl-bump \
 sslcrtd_program /usr/lib64/squid/security_file_certgen -s /var/spool/squid/ssl_db -M 64MB
 sslcrtd_children 32 startup=5 idle=1
 
-# SSL-Bump
-acl step1 at_step SslBump1
-ssl_bump peek step1
+# SSL-Bump & exception list
+acl DiscoverSNIHost at_step SslBump1
+acl NoSSLIntercept ssl::server_name_regex "/etc/squid/exceptions/no-proxy.txt"
+ssl_bump peek DiscoverSNIHost
+ssl_bump splice NoSSLIntercept
 ssl_bump bump all
 
 # Cache size

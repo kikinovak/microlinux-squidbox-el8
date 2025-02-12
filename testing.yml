@@ -109,7 +109,7 @@
     - name: Fetch exception list from GitLab
       ansible.builtin.git:
         repo: "https://gitlab.com/kikinovak/no-proxy.git"
-        dest: /etc/squid/no-proxy
+        dest: /etc/squid/exceptions
 
     - name: Configure Squid
       ansible.builtin.template:
