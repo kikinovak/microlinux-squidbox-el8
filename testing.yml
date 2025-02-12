@@ -24,6 +24,10 @@
 
   tasks:
 
+    - name: Include encrypted variables
+      ansible.builtin.include_vars:
+        file: vars/secret.yml
+
     - name: Import SquidAnalyzer repository GPG key
       ansible.builtin.rpm_key:
         key: "https://download.copr.fedorainfracloud.org/\
