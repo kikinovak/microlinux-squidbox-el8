@@ -144,7 +144,15 @@
           - squidanalyzer
           - perl-Time-HiRes
         state: present
-      
+
+    - name: Open port 80 for Apache
+      ansible.posix.firewalld:
+        zone: internal
+        service: http
+        state: enabled
+        permanent: true
+        immediate: true
+
   handlers:
 
     - name: Restart Squid
