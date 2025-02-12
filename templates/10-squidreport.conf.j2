@@ -1,0 +1,16 @@
+# /etc/httpd/conf.d/10-squidreport-{{hostname}}.conf
+# 
+# squidreport.{{hostname}}.{{domain_lan}}
+
+<VirtualHost *:80>
+  ServerAdmin {{mail_root}}
+  DocumentRoot "/var/www/squidanalyzer"
+  <Directory "/var/www/squidanalyzer">
+    Options -Indexes +FollowSymlinks +MultiViews
+    AllowOverride None
+  </Directory>
+  ServerName squidreport.{{hostname}}.{{domain_lan}}
+  ServerAlias squidreport.{{hostname}}
+  ErrorLog logs/squidreport.{{hostname}}-error_log
+  CustomLog logs/squidreport.{{hostname}}-access_log common
+</VirtualHost>

@@ -153,11 +153,45 @@
         permanent: true
         immediate: true
 
+    - name: Install Apache
+      ansible.builtin.dnf:
+        name: httpd
+        state: present
+
+    - name: Make sure Apache is enabled and started
+      ansible.builtin.service:
+        name: httpd
+        enabled: true
+        state: started
+
+    - name: Configure Apache
+      ansible.builtin.template:
+        src: httpd.conf.j2
+        dest: /etc/httpd/conf/httpd
+        owner: root
+        group: root
+        mode: 0644
+      notify: Restart Apache
+
+    - name: Configure Virtual Host for SquidAnalyzer
+      ansible.builtin.template:
+        src: 10-squidreport.conf.j2
+        dest: "/etc/httpd/conf.d/10-squidreport-{{hostname}}.conf"
+        owner: root
+        group: root
+        mode: 0644
+      notify: Restart Apache
+
   handlers:
 
     - name: Restart Squid
       ansible.builtin.service:
         name: squid
+        state: restarted
+
+    - name: Restart Apache
+      ansible.builtin.service:
+        name: httpd
         state: restarted
 
 ...
