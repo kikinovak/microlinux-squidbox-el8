@@ -24,6 +24,24 @@
 
   tasks:
 
+    - name: Import SquidAnalyzer repository GPG key
+      ansible.builtin.rpm_key:
+        key: "https://download.copr.fedorainfracloud.org/\
+              results/tachtler/squidanalyzer/pubkey.gpg"
+        state: present
+
+    - name: Enable SquidAnalyzer repository with a priority of 10
+      ansible.builtin.yum_repository:
+        name: squidanalyzer
+        file: squidanalyzer
+        description: SquidAnalyzer
+        baseurl:
+          - "https://download.copr.fedorainfracloud.org/\
+             results/tachtler/squidanalyzer/epel-8-$basearch/"
+        gpgcheck: true
+        enabled: true
+        priority: 10
+
     - name: Open port 3128 for Squid
       ansible.posix.firewalld:
         zone: internal
