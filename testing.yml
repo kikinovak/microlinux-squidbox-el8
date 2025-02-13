@@ -218,6 +218,8 @@
         src: rsync://ftp.ut-capitole.fr/blacklist
         dest: /var/squidGuard
         delete: true
+        owner: squid
+        group: squid
 
     - name: Configure SquidGuard
       ansible.builtin.template:
@@ -226,7 +228,6 @@
         owner: root
         group: root
         mode: 0644
-      notify: Restart Squid
 
   handlers:
 
