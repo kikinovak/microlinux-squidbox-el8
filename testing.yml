@@ -243,6 +243,16 @@
         group: root
         mode: 0644
 
+    - name: Install proxy management scripts
+      ansible.builtin.template:
+        src: "proxy-{{item}}.sh.j2"
+        dest: "/root/bin/proxy-{{item}}.sh"
+        owner: root
+        group: root
+        mode: 0700
+      with_items:
+        - enable
+        - disable
 
   handlers:
 

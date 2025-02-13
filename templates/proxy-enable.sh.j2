@@ -1,0 +1,10 @@
+#!/bin/bash
+# 
+# proxy-enable.sh
+firewall-cmd --permanent --add-service=squid
+firewall-cmd --permanent --add-forward-port=port=80:proto=tcp:toport=3128:toaddr={{address_lan}}
+firewall-cmd --permanent --add-port=3129/tcp
+firewall-cmd --permanent --add-forward-port=port=443:proto=tcp:toport=3129:toaddr={{address_lan}}
+firewall-cmd --reload
+firewall-cmd --list-all
+

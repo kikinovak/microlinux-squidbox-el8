@@ -1,0 +1,9 @@
+#!/bin/bash
+# 
+# proxy-disable.sh
+firewall-cmd --permanent --remove-forward-port=port=80:proto=tcp:toport=3128:toaddr={{address_lan}}
+firewall-cmd --permanent --remove-service=squid
+firewall-cmd --permanent --remove-forward-port=port=443:proto=tcp:toport=3129:toaddr={{address_lan}}
+firewall-cmd --permanent --remove-port=3129/tcp
+firewall-cmd --reload
+firewall-cmd --list-all
