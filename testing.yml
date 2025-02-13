@@ -221,8 +221,6 @@
         group: squid
         mode: 0755
 
-    - meta: end_play
-
     - name: Fetch blacklists (Université de Toulouse)
       ansible.posix.synchronize:
         src: rsync://ftp.ut-capitole.fr/blacklist
