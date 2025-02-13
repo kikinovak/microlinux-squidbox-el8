@@ -213,10 +213,27 @@
         name: squidGuard
         state: present
 
-    - name: Install blacklist database script
+    - name: Download blacklist database script
       ansible.builtin.git:
         repo: "https://gitlab.com/kikinovak/squidguard.git"
         dest: /var/tmp/squidguard
+
+    - name: Create binaries directory
+      ansible.builtin.file:
+        path: /root/bin
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: Install blacklist database script
+      ansible.builtin.copy:
+        src: /var/tmp/squidguard/blacklist.sh
+        dest: /root/bin/blacklist.sh
+        owner: root
+        group: root
+        mode: 0700
+        remote_src: true
 
     - name: Configure SquidGuard
       ansible.builtin.template:
