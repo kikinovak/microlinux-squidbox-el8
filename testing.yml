@@ -186,6 +186,11 @@
         mode: 0644
       notify: Restart Apache
 
+    - name: Fetch static HTML pages for default Virtual Host
+      ansible.builtin.git:
+        repo: "https://gitlab.com/kikinovak/squid-html.git"
+        dest: /var/www/html
+
     - name: Configure Virtual Host for SquidAnalyzer
       ansible.builtin.template:
         src: 10-squidreport.conf.j2
