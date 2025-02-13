@@ -216,7 +216,7 @@
     - name: Install blacklist database script
       ansible.builtin.git:
         repo: "https://gitlab.com/kikinovak/squidguard.git"
-        dest: /var/tmp
+        dest: /var/tmp/squidguard
 
     - name: Configure SquidGuard
       ansible.builtin.template:
