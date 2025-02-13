@@ -177,6 +177,15 @@
         mode: 0644
       notify: Restart Apache
 
+    - name: Configure default Virtual Host
+      ansible.builtin.template:
+        src: 00-default.conf.j2
+        dest: "/etc/httpd/conf.d/00-default.conf"
+        owner: root
+        group: root
+        mode: 0644
+      notify: Restart Apache
+
     - name: Configure Virtual Host for SquidAnalyzer
       ansible.builtin.template:
         src: 10-squidreport.conf.j2
@@ -193,6 +202,7 @@
         owner: root
         group: root
         mode: 0644
+
 
   handlers:
 

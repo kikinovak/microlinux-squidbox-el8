@@ -1,0 +1,12 @@
+# /etc/httpd/conf.d/00-default.conf
+# 
+# {{hostname}}.{{domain_lan}}
+
+<VirtualHost *:80>
+  ServerAdmin {{mail_root}}
+  DocumentRoot "/var/www/html"
+  ServerName {{hostname}}.{{domain_lan}}
+  ServerAlias {{hostname}}
+  ErrorLog logs/{{hostname}}-error_log
+  CustomLog logs/{{hostname}}-access_log common
+</VirtualHost>
