@@ -219,6 +219,14 @@
         dest: /var/squidGuard
         delete: true
 
+    - name: Configure SquidGuard
+      ansible.builtin.template:
+        src: squidGuard.conf.j2
+        dest: /etc/squid/squidGuard.conf
+        owner: root
+        group: root
+        mode: 0644
+
   handlers:
 
     - name: Restart Squid
