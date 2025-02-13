@@ -213,19 +213,22 @@
         name: squidGuard
         state: present
 
-    - name: Create download directory
-      ansible.builtin.file:
-        path: /var/squidGuard/dest
-        state: directory
-        owner: squid
-        group: squid
-        mode: 0755
+    # - name: Create download directory
+    #   ansible.builtin.file:
+    #     path: /var/squidGuard/dest
+    #     state: directory
+    #     owner: squid
+    #     group: squid
+    #     mode: 0755
 
     - name: Fetch blacklists (Université de Toulouse)
       ansible.posix.synchronize:
         src: rsync://ftp.ut-capitole.fr/blacklist
         dest: /var/squidGuard
         delete: true
+        owner: false
+        group: false
+      become_user: squid
 
     - name: Configure SquidGuard
       ansible.builtin.template:
