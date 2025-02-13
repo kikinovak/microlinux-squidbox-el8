@@ -213,6 +213,11 @@
         name: squidGuard
         state: present
 
+    - name: Fetch blacklists
+      ansible.posix.synchronize:
+        src: rsync://dsi.ut-capitole.fr/blacklist
+        dest: /var/squidGuard
+
   handlers:
 
     - name: Restart Squid
