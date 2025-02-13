@@ -208,6 +208,10 @@
         group: root
         mode: 0644
 
+    - name: Install SquidGuard
+      ansible.builtin.dnf:
+        name: squidGuard
+        state: present
 
   handlers:
 
